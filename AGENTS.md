@@ -250,3 +250,58 @@ export default function Widgets({ loaderData }: Route.ComponentProps) {
 **For migrations**: Check framework version migration guides for breaking changes
 
 Prefer retrieval-led reasoning. When uncertain about Gadget-specific APIs or behaviors, fetch the documentation rather than relying on general web framework knowledge.
+
+---
+
+## This App: xxi
+
+A Gadget app with a PixiJS card game frontend. Gadget handles the backend (models, actions, auth, API); the card game renders on an HTML canvas via PixiJS 8.
+
+### Commands
+
+```bash
+yarn test                              # Run all tests (opens browser, Playwright/Chromium)
+yarn test --run                        # Run once without watch
+yarn test --run --browser.headless     # Run headless (use this in CI and automation)
+yarn test Card                         # Run tests matching "Card"
+yarn build                             # Production build (Vite)
+```
+
+**AI agents must always run tests with `--browser.headless`.**
+
+### Architecture
+
+**React layer** (`web/components/App.tsx`, `web/routes/`, `web/components/ui/`): BrowserRouter, shadcn/ui, auth pages. API client at `web/api.ts`.
+
+**PixiJS game layer** (`web/components/Card.ts`, `web/components/SnapArea.ts`, `web/components/PixiCanvas.tsx`): Canvas-based card game. `PixiCanvas.tsx` is the React wrapper that initializes the PixiJS `Application`. Game components are plain TypeScript classes extending PixiJS `Container` — not React components.
+
+### PixiJS Component Pattern
+
+Game objects (Card, SnapArea) extend `Container`, draw with `Graphics`/`Text` in the constructor, and handle their own pointer events. All live as siblings on `app.stage` (not nested) to keep coordinates simple.
+
+**SnapArea** uses a static registry — instances auto-register on construction. `SnapArea.nearest(x, y)` finds the closest area. Card's `onDragEnd` calls this to snap cards. Call `SnapArea.clearAll()` between tests to prevent leaks.
+
+### Testing
+
+Tests use **Vitest browser mode** with Playwright (Chromium) — real browser, no jsdom. Default is non-headless (shows browser). Use `--browser.headless` for CI/automation.
+
+Test helpers (`web/test-helpers.ts`):
+- `mount(app)` — appends PixiJS canvas to DOM
+- `waitFrames(app, n)` — wait for N render frames
+- `pointerEvent(app, type, x, y)` — dispatch pointer events at stage coordinates
+- `drag(app, fromX, fromY, toX, toY)` — full drag gesture with intermediate steps
+- `snapshot(app, label)` — captures canvas as labeled `<img>` for Vitest dashboard
+- `readPixel(app, x, y)` — returns `[r, g, b, a]` for color assertions
+
+Tests create a fresh `Application` in `beforeEach` and `destroy()` in `afterEach`.
+
+### Path Alias
+
+`@` resolves to `./web` (in both `vite.config.mts` and `vitest.config.mts`).
+
+### Gadget Config
+
+- Framework: v1.6.0
+- Auth: email/password + Google OAuth (`settings.gadget.ts`)
+- Models: `user`, `session`
+- Access control: `accessControl/permissions.gadget.ts`, `accessControl/filters/user/tenant.gelly`

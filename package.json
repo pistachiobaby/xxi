@@ -5,7 +5,8 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production vite build"
+    "build": "NODE_ENV=production vite build",
+    "test": "vitest"
   },
   "dependencies": {
     "@gadget-client/xxi": "link:.gadget/client",
@@ -35,6 +36,7 @@
     "date-fns": "^4.1.0",
     "gadget-server": "link:.gadget/server",
     "lucide-react": "^0.471.1",
+    "pixi.js": "^8.16.0",
     "react": "^19.1.2",
     "react-day-picker": "^9.5.1",
     "react-dom": "^19.1.2",
@@ -49,8 +51,12 @@
     "@types/react": "^19.1.1",
     "@types/react-dom": "^19.1.1",
     "@vitejs/plugin-react-swc": "^3.8.1",
+    "@vitest/browser": "^4.0.18",
+    "@vitest/browser-playwright": "^4.0.18",
+    "playwright": "^1.58.2",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.18"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

@@ -49,7 +49,7 @@ export default function () {
           </div>
         </div>
       </nav>
-      <main className="grow bg-muted/20">
+      <main className="grow overflow-hidden">
         <Outlet />
       </main>
       <footer className="bg-gray-50 border-t shrink-0">
