@@ -16,6 +16,30 @@ export const permissions: GadgetPermissions = {
         action: true,
       },
       models: {
+        bundle: {
+          read: true,
+          actions: {
+            create: true,
+            delete: true,
+            update: true,
+          },
+        },
+        item: {
+          read: true,
+          actions: {
+            create: true,
+            delete: true,
+            update: true,
+          },
+        },
+        roll: {
+          read: true,
+          actions: {
+            create: true,
+            delete: true,
+            update: true,
+          },
+        },
         user: {
           read: {
             filter: "accessControl/filters/user/tenant.gelly",
@@ -33,10 +57,24 @@ export const permissions: GadgetPermissions = {
           },
         },
       },
+      actions: {
+        seedBundle: true,
+      },
     },
     unauthenticated: {
       storageKey: "unauthenticated",
       models: {
+        bundle: {
+          read: true,
+        },
+        item: {
+          read: true,
+        },
+        roll: {
+          actions: {
+            create: true,
+          },
+        },
         user: {
           actions: {
             resetPassword: true,
@@ -47,6 +85,9 @@ export const permissions: GadgetPermissions = {
             verifyEmail: true,
           },
         },
+      },
+      actions: {
+        seedBundle: true,
       },
     },
   },

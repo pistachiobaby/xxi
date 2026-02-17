@@ -1,7 +1,6 @@
 import { Application, Container, Graphics, Sprite, Texture, Ticker } from "pixi.js";
 import { ReelItemTile } from "./ReelItemTile";
 import {
-  PLACEHOLDER_ITEMS,
   REEL_ITEM_WIDTH,
   REEL_ITEM_HEIGHT,
   SPIN_SPEED,
@@ -79,10 +78,10 @@ export class SpotlightReel extends Container {
   /** @internal Spring displacement during landing (px), exposed for testing */
   _springOffset = 0;
 
-  constructor(app: Application, width?: number) {
+  constructor(app: Application, width: number, items: ReelItem[]) {
     super();
     this.app = app;
-    this.items = [...PLACEHOLDER_ITEMS];
+    this.items = [...items];
     this._easingDerivAtZero = SMOOTH_STOP_M0;
 
     // Viewport fills the given width, or defaults to screen width
@@ -132,15 +131,12 @@ export class SpotlightReel extends Container {
     return this.strip.x;
   }
 
-  /** Start a spin. Pass a seed for deterministic replay. */
-  spin(seed?: number) {
+  /** Start a spin. The backend picks the winner; seed drives visual filler only. */
+  spin(seed: number, winner: ReelItem) {
     if (this.state !== ReelState.IDLE) return;
 
-    // Seed the PRNG
-    this.rng = mulberry32(seed ?? (Date.now() ^ (Math.random() * 0xffffffff)));
-
-    // Pre-select winner using the PRNG
-    this.targetItem = this.items[Math.floor(this.rng() * this.items.length)];
+    this.rng = mulberry32(seed);
+    this.targetItem = winner;
 
     this.elapsed = 0;
     this.state = ReelState.SPINNING;

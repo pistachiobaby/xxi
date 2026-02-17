@@ -6,3 +6,4 @@ node_modules/
 .vitest-attachments/
 **/__screenshots__/
 **/__traces__/
+.env.local
