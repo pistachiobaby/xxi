@@ -1,20 +1,31 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Application } from "pixi.js";
-import { Card } from "./Card";
-import { SnapArea } from "./SnapArea";
+import { SpotlightReel } from "./SpotlightReel";
+import { REEL_ITEM_HEIGHT } from "./constants";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import type { ReelItem } from "./constants";
 
-const SUITS = ["♠", "♥", "♦", "♣"] as const;
-const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"] as const;
+// HMR counter — increments each time this module is re-evaluated,
+// which forces the useEffect to tear down and re-create the PixiJS app.
+let _hmr = 0;
+if (import.meta.hot) {
+  _hmr = (import.meta.hot.data._hmr ?? 0) + 1;
+  import.meta.hot.data._hmr = _hmr;
+}
 
-const SUIT_COLORS: Record<string, number> = {
-  "♠": 0xf0f0f0,
-  "♣": 0xf0f0f0,
-  "♥": 0xfff0f0,
-  "♦": 0xfff0f0,
+const RARITY_COLORS: Record<string, string> = {
+  Common: "bg-gray-500",
+  Rare: "bg-blue-500",
+  Epic: "bg-purple-500",
+  Legendary: "bg-amber-500",
 };
 
 export default function PixiCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const reelRef = useRef<SpotlightReel | null>(null);
+  const [rolling, setRolling] = useState(false);
+  const [result, setResult] = useState<ReelItem | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -26,7 +37,7 @@ export default function PixiCanvas() {
 
     (async () => {
       await app.init({
-        background: "#1a472a",
+        background: "#0a0a14",
         resizeTo: container,
         antialias: true,
       });
@@ -39,45 +50,72 @@ export default function PixiCanvas() {
       initialized = true;
       container.appendChild(app.canvas);
 
-      // Deal out a shuffled hand of cards
-      const deck = SUITS.flatMap((suit) =>
-        RANKS.map((rank) => ({ label: `${rank}${suit}`, color: SUIT_COLORS[suit] }))
-      );
+      // Reel spans the full screen width, centered vertically in the top half
+      const reel = new SpotlightReel(app, app.screen.width);
+      reel.x = 0;
+      reel.y = (app.screen.height / 2 - REEL_ITEM_HEIGHT) / 2;
+      app.stage.addChild(reel);
 
-      // Shuffle
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-      }
+      reel.onReveal = (item) => {
+        setRolling(false);
+        setResult(item);
+      };
 
-      // Create snap areas
-      const hand = new SnapArea("Hand");
-      hand.x = 40;
-      hand.y = (app.screen.height - 300) / 2;
-      app.stage.addChild(hand);
-
-      const table = new SnapArea("Table");
-      table.x = app.screen.width - 240;
-      table.y = (app.screen.height - 300) / 2;
-      app.stage.addChild(table);
-
-      // Deal 10 cards into the hand area
-      const cardCount = 10;
-      for (let i = 0; i < cardCount; i++) {
-        const { label, color } = deck[i];
-        const card = new Card(label, color);
-        app.stage.addChild(card);
-        hand.addCard(card);
-      }
+      reelRef.current = reel;
     })();
 
     return () => {
       cancelled = true;
+      reelRef.current = null;
       if (initialized) {
         app.destroy(true, { children: true });
       }
     };
-  }, []);
+  }, [_hmr]);
 
-  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+  const handleRoll = useCallback(() => {
+    if (rolling) return;
+    const reel = reelRef.current;
+    if (!reel) return;
+    setRolling(true);
+    setResult(null);
+    reel.spin();
+  }, [rolling]);
+
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+
+      {/* Roll button + result overlay */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        {result && (
+          <div className="flex items-center gap-2">
+            <Badge className={RARITY_COLORS[result.rarity]}>
+              {result.rarity}
+            </Badge>
+            <span className="text-white font-bold text-lg">{result.name}</span>
+          </div>
+        )}
+        <Button
+          size="lg"
+          onClick={handleRoll}
+          disabled={rolling}
+          className="min-w-[140px]"
+        >
+          {rolling ? "Rolling..." : "Roll"}
+        </Button>
+      </div>
+    </div>
+  );
 }

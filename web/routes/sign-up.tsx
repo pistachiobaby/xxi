@@ -1,7 +1,7 @@
 import { SignUpComponent } from "@/components/auth/sign-up";
 import { useLocation, useNavigate } from "react-router";
 
-export default function () {
+export default function SignUpPage() {
   const { search } = useLocation();
   const navigate = useNavigate();
 

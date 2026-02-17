@@ -7,7 +7,7 @@ import { useActionForm, useUser } from "@gadgetinc/react";
 import { useState } from "react";
 import { api } from "../api";
 
-export default function () {
+export default function ProfilePage() {
   const user = useUser(api);
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);

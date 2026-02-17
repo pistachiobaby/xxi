@@ -8,7 +8,7 @@ import { CheckCircle } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { api } from "../api";
 
-export default function () {
+export default function ResetPasswordPage() {
   const location = useLocation();
 
   const {

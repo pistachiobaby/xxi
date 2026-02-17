@@ -4,7 +4,7 @@ import { useUser } from "@gadgetinc/react";
 import { Pencil } from "lucide-react";
 import { api } from "../api";
 
-export default function () {
+export default function SignedInPage() {
   const user = useUser(api);
 
   return (

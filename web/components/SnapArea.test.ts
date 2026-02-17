@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import { Application } from "pixi.js";
-import { mount, waitFrames, drag, snapshot } from "../test-helpers";
+import { mount, waitFrames, drag, snapshot, readPixel, pointerEvent } from "../test-helpers";
 import { SnapArea, SNAP_AREA_WIDTH, SNAP_AREA_HEIGHT } from "./SnapArea";
 import { Card, CARD_WIDTH, CARD_HEIGHT } from "./Card";
 
@@ -192,6 +192,137 @@ describe("SnapArea", () => {
 
     // Even a point inside the visual rect returns false — no snap zone defined
     expect(area.containsPoint(150, 150)).toBe(false);
+  });
+
+  it("creates zone graphic when snapPadding is set", () => {
+    const area = new SnapArea("Zone", { snapPadding: 40 });
+    // 3 children: zone graphic, bg graphic, label text
+    expect(area.children.length).toBe(3);
+  });
+
+  it("does not create zone graphic without snapPadding", () => {
+    const area = new SnapArea("Plain");
+    // 2 children: bg graphic, label text (no zone)
+    expect(area.children.length).toBe(2);
+  });
+
+  it("zone indicator is hidden by default", async () => {
+    const area = new SnapArea("Hidden", { snapPadding: 60 });
+    area.x = 200;
+    area.y = 100;
+    app.stage.addChild(area);
+
+    await waitFrames(app, 2);
+    snapshot(app, "zone hidden by default");
+
+    // The zone child exists but is not visible
+    const zone = area.children[0];
+    expect(zone.visible).toBe(false);
+  });
+
+  it("highlightNearest highlights the drop target area", () => {
+    const areaA = new SnapArea("A", { snapPadding: 30 });
+    areaA.x = 0;
+    areaA.y = 0;
+    const areaB = new SnapArea("B", { snapPadding: 30 });
+    areaB.x = 400;
+    areaB.y = 0;
+
+    // Point near A — only A highlighted
+    SnapArea.highlightNearest(50, 50);
+    expect(areaA.highlighted).toBe(true);
+    expect(areaB.highlighted).toBe(false);
+
+    // Move near B — switches
+    SnapArea.highlightNearest(450, 50);
+    expect(areaA.highlighted).toBe(false);
+    expect(areaB.highlighted).toBe(true);
+  });
+
+  it("highlightNearest works on areas without snapPadding", () => {
+    const area = new SnapArea("NoPad");
+    area.x = 100;
+    area.y = 100;
+
+    expect(area.highlighted).toBe(false);
+    SnapArea.highlightNearest(200, 200);
+    expect(area.highlighted).toBe(true);
+  });
+
+  it("highlightNearest shows zone graphic on target with padding", () => {
+    const area = new SnapArea("Zoned", { snapPadding: 50 });
+    area.x = 100;
+    area.y = 100;
+
+    const zone = area.children[0];
+    expect(zone.visible).toBe(false);
+
+    SnapArea.highlightNearest(150, 150);
+    expect(zone.visible).toBe(true);
+  });
+
+  it("clearHighlight resets all areas", () => {
+    const areaA = new SnapArea("A", { snapPadding: 50 });
+    areaA.x = 0;
+    areaA.y = 0;
+    const areaB = new SnapArea("B");
+    areaB.x = 400;
+    areaB.y = 0;
+
+    SnapArea.highlightNearest(50, 50);
+    expect(areaA.highlighted).toBe(true);
+
+    SnapArea.clearHighlight();
+    expect(areaA.highlighted).toBe(false);
+    expect(areaB.highlighted).toBe(false);
+    // Zone also hidden
+    expect(areaA.children[0].visible).toBe(false);
+  });
+
+  it("dragging a card highlights the target area and clears on drop", async () => {
+    const areaA = new SnapArea("A", { snapPadding: 40 });
+    areaA.x = 50;
+    areaA.y = 50;
+    const areaB = new SnapArea("B", { snapPadding: 40 });
+    areaB.x = 400;
+    areaB.y = 50;
+    app.stage.addChild(areaA, areaB);
+
+    const card = new Card("A♠");
+    card.x = 60;
+    card.y = 60;
+    app.stage.addChild(card);
+    await waitFrames(app, 2);
+
+    expect(areaA.highlighted).toBe(false);
+    expect(areaB.highlighted).toBe(false);
+    snapshot(app, "before drag — nothing highlighted");
+
+    // Start dragging near area A
+    pointerEvent(app, "pointerdown", 100, 120);
+    await waitFrames(app, 1);
+    pointerEvent(app, "pointermove", 100, 120);
+    await waitFrames(app, 1);
+
+    expect(areaA.highlighted).toBe(true);
+    expect(areaB.highlighted).toBe(false);
+    snapshot(app, "dragging near A — A highlighted");
+
+    // Move toward area B
+    pointerEvent(app, "pointermove", 450, 150);
+    await waitFrames(app, 1);
+
+    expect(areaA.highlighted).toBe(false);
+    expect(areaB.highlighted).toBe(true);
+    snapshot(app, "dragging near B — B highlighted");
+
+    // Drop
+    pointerEvent(app, "pointerup", 450, 150);
+    await waitFrames(app, 1);
+
+    expect(areaA.highlighted).toBe(false);
+    expect(areaB.highlighted).toBe(false);
+    snapshot(app, "after drop — nothing highlighted");
   });
 
   it("clearAll() empties the registry", () => {

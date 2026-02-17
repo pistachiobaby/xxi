@@ -1,9 +1,7 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
-import type { Card } from "./Card";
-import { CARD_WIDTH, CARD_HEIGHT } from "./Card";
+import { CARD_WIDTH, CARD_HEIGHT, SNAP_AREA_WIDTH, SNAP_AREA_HEIGHT } from "./constants";
 
-export const SNAP_AREA_WIDTH = 200;
-export const SNAP_AREA_HEIGHT = 300;
+export { SNAP_AREA_WIDTH, SNAP_AREA_HEIGHT };
 
 const LABEL_HEIGHT = 30;
 const STACK_OFFSET = 4;
@@ -15,8 +13,11 @@ export interface SnapAreaOptions {
 export class SnapArea extends Container {
   private static registry: SnapArea[] = [];
 
-  private cards: Card[] = [];
+  private cards: Container[] = [];
   private readonly _snapPadding: number | undefined;
+  private readonly _zone: Graphics | null = null;
+  private readonly _bg: Graphics;
+  private _highlighted = false;
 
   static get all(): readonly SnapArea[] {
     return this.registry;
@@ -50,6 +51,19 @@ export class SnapArea extends Container {
     return best;
   }
 
+  static highlightNearest(x: number, y: number) {
+    const target = this.nearest(x, y);
+    for (const area of this.registry) {
+      area.setHighlighted(area === target);
+    }
+  }
+
+  static clearHighlight() {
+    for (const area of this.registry) {
+      area.setHighlighted(false);
+    }
+  }
+
   static clearAll() {
     this.registry.length = 0;
   }
@@ -57,12 +71,24 @@ export class SnapArea extends Container {
   constructor(label: string, options?: SnapAreaOptions) {
     super();
 
+    this._snapPadding = options?.snapPadding;
+
+    // Snap zone indicator (drawn behind everything, only if padding is set)
+    if (this._snapPadding != null) {
+      const zone = new Graphics();
+      const p = this._snapPadding;
+      zone.roundRect(-p, -p, SNAP_AREA_WIDTH + p * 2, SNAP_AREA_HEIGHT + p * 2, 16);
+      zone.fill({ color: 0xffffff, alpha: 0.03 });
+      zone.stroke({ color: 0xffffff, alpha: 0.1, width: 1 });
+      zone.visible = false;
+      this._zone = zone;
+      this.addChild(zone);
+    }
+
     // Background
-    const bg = new Graphics();
-    bg.roundRect(0, 0, SNAP_AREA_WIDTH, SNAP_AREA_HEIGHT, 12);
-    bg.fill({ color: 0xffffff, alpha: 0.08 });
-    bg.stroke({ color: 0xaaaaaa, width: 1 });
-    this.addChild(bg);
+    this._bg = new Graphics();
+    this.drawBg(false);
+    this.addChild(this._bg);
 
     // Label
     const text = new Text({
@@ -77,9 +103,30 @@ export class SnapArea extends Container {
     text.x = SNAP_AREA_WIDTH / 2 - text.width / 2;
     text.y = 8;
     this.addChild(text);
-
-    this._snapPadding = options?.snapPadding;
     SnapArea.registry.push(this);
+  }
+
+  get highlighted(): boolean {
+    return this._highlighted;
+  }
+
+  private setHighlighted(on: boolean) {
+    if (this._highlighted === on) return;
+    this._highlighted = on;
+    if (this._zone) this._zone.visible = on;
+    this.drawBg(on);
+  }
+
+  private drawBg(highlighted: boolean) {
+    this._bg.clear();
+    this._bg.roundRect(0, 0, SNAP_AREA_WIDTH, SNAP_AREA_HEIGHT, 12);
+    if (highlighted) {
+      this._bg.fill({ color: 0xffffff, alpha: 0.15 });
+      this._bg.stroke({ color: 0xffffff, width: 1.5, alpha: 0.6 });
+    } else {
+      this._bg.fill({ color: 0xffffff, alpha: 0.08 });
+      this._bg.stroke({ color: 0xaaaaaa, width: 1, alpha: 0.4 });
+    }
   }
 
   containsPoint(x: number, y: number): boolean {
@@ -111,7 +158,7 @@ export class SnapArea extends Container {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  addCard(card: Card) {
+  addCard(card: Container) {
     // Remove from any other area first
     for (const area of SnapArea.registry) {
       if (area !== this) {
@@ -127,7 +174,7 @@ export class SnapArea extends Container {
     this.layoutCards();
   }
 
-  removeCard(card: Card) {
+  removeCard(card: Container) {
     const idx = this.cards.indexOf(card);
     if (idx !== -1) {
       this.cards.splice(idx, 1);

@@ -295,6 +295,8 @@ Test helpers (`web/test-helpers.ts`):
 
 Tests create a fresh `Application` in `beforeEach` and `destroy()` in `afterEach`.
 
+Trace output goes to `.vitest/traces/` (configured via `tracesDir` in `vitest.config.mts`). This directory is gitignored and ggt-ignored (`.ignore`).
+
 ### Path Alias
 
 `@` resolves to `./web` (in both `vite.config.mts` and `vitest.config.mts`).

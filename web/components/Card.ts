@@ -1,8 +1,8 @@
 import { Container, Graphics, Text, TextStyle, FederatedPointerEvent } from "pixi.js";
+import { CARD_WIDTH, CARD_HEIGHT } from "./constants";
 import { SnapArea } from "./SnapArea";
 
-export const CARD_WIDTH = 80;
-export const CARD_HEIGHT = 120;
+export { CARD_WIDTH, CARD_HEIGHT };
 
 export class Card extends Container {
   private bg: Graphics;
@@ -56,11 +56,13 @@ export class Card extends Container {
     const pos = e.getLocalPosition(this.parent);
     this.x = pos.x - this.dragOffset.x;
     this.y = pos.y - this.dragOffset.y;
+    SnapArea.highlightNearest(this.x + CARD_WIDTH / 2, this.y + CARD_HEIGHT / 2);
   }
 
   private onDragEnd() {
     this.dragging = false;
     this.alpha = 1;
+    SnapArea.clearHighlight();
     const area = SnapArea.nearest(this.x + CARD_WIDTH / 2, this.y + CARD_HEIGHT / 2);
     if (area) area.addCard(this);
   }

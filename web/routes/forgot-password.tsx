@@ -7,7 +7,7 @@ import { useActionForm } from "@gadgetinc/react";
 import { CheckCircle } from "lucide-react";
 import { api } from "../api";
 
-export default function () {
+export default function ForgotPasswordPage() {
   const {
     submit,
     register,

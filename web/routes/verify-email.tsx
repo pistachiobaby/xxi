@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
 import { api } from "../api";
 
-export default function () {
+export default function VerifyEmailPage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const code = params.get("code");

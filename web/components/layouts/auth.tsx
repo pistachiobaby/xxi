@@ -12,7 +12,7 @@
 import { SignedOutOrRedirect } from "@gadgetinc/react";
 import { Outlet } from "react-router";
 
-export default function () {
+export default function AuthLayout() {
   return (
     <SignedOutOrRedirect>
       <div className="w-full h-full grid place-items-center">

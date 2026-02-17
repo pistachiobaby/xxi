@@ -17,12 +17,12 @@ import { UserIcon } from "@/components/shared/UserIcon";
 import { api } from "../../api";
 import { Navigation } from "@/components/public/nav";
 
-export default function () {
+export default function PublicLayout() {
   const user = useUser(api);
 
   return (
     <div className="flex flex-col h-full">
-      <nav className="border-b shrink-0">
+      <nav className="border-b border-white/10 shrink-0" style={{ backgroundColor: "#12121f" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <Navigation />
@@ -52,11 +52,6 @@ export default function () {
       <main className="grow overflow-hidden">
         <Outlet />
       </main>
-      <footer className="bg-gray-50 border-t shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <p className="text-sm text-gray-500">© {new Date().getFullYear()} Your Company. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }

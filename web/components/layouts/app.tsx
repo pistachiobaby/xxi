@@ -17,7 +17,7 @@ import { SignedInOrRedirect, useUser } from "@gadgetinc/react";
 import { Outlet } from "react-router";
 import { api } from "../../api";
 
-export default function () {
+export default function AppLayout() {
   const user = useUser(api);
 
   return (

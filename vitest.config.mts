@@ -17,6 +17,7 @@ export default defineConfig({
         mode: "on",
         screenshots: true,
         snapshots: true,
+        tracesDir: ".vitest/traces",
       },
     },
   },
