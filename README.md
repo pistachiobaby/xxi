@@ -1,6 +1,6 @@
 # xxi
 
-A provably fair card game built on [Gadget](https://gadget.dev) with a PixiJS 8 canvas frontend.
+A provably fair gacha game built on [Gadget](https://gadget.dev) with a PixiJS 8 canvas frontend.
 
 ## Architecture
 
@@ -13,8 +13,6 @@ web/
     SpotlightReel.ts      Reel animation (spin, decelerate, spring-settle)
     ReelItemTile.ts       Individual item tiles on the reel
     RevealEffect.ts       Flash effect on reveal
-    Card.ts               Draggable card (PixiJS Container)
-    SnapArea.ts           Drop targets with static registry
     FairnessPanel.tsx     Provably fair verification UI
   lib/
     verify.ts             Client-side cryptographic verification (Web Crypto)
@@ -38,7 +36,6 @@ Game components are plain TypeScript classes extending PixiJS `Container` -- not
 ```bash
 yarn test                              # Run tests (opens browser)
 yarn test --run --browser.headless     # Run headless
-yarn test Card                         # Run tests matching "Card"
 yarn build                             # Production build
 ```
 

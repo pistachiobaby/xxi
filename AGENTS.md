@@ -255,7 +255,7 @@ Prefer retrieval-led reasoning. When uncertain about Gadget-specific APIs or beh
 
 ## This App: xxi
 
-A Gadget app with a PixiJS card game frontend. Gadget handles the backend (models, actions, auth, API); the card game renders on an HTML canvas via PixiJS 8.
+A Gadget app with a PixiJS gacha game frontend. Gadget handles the backend (models, actions, auth, API); the game renders on an HTML canvas via PixiJS 8.
 
 ### Commands
 
@@ -263,7 +263,6 @@ A Gadget app with a PixiJS card game frontend. Gadget handles the backend (model
 yarn test                              # Run all tests (opens browser, Playwright/Chromium)
 yarn test --run                        # Run once without watch
 yarn test --run --browser.headless     # Run headless (use this in CI and automation)
-yarn test Card                         # Run tests matching "Card"
 yarn build                             # Production build (Vite)
 ```
 
@@ -273,13 +272,11 @@ yarn build                             # Production build (Vite)
 
 **React layer** (`web/components/App.tsx`, `web/routes/`, `web/components/ui/`): BrowserRouter, shadcn/ui, auth pages. API client at `web/api.ts`.
 
-**PixiJS game layer** (`web/components/Card.ts`, `web/components/SnapArea.ts`, `web/components/PixiCanvas.tsx`): Canvas-based card game. `PixiCanvas.tsx` is the React wrapper that initializes the PixiJS `Application`. Game components are plain TypeScript classes extending PixiJS `Container` — not React components.
+**PixiJS game layer** (`web/components/PixiCanvas.tsx`, `web/components/SpotlightReel.ts`, `web/components/ReelItemTile.ts`, `web/components/RevealEffect.ts`): Canvas-based gacha reel. `PixiCanvas.tsx` is the React wrapper that initializes the PixiJS `Application`. Game components are plain TypeScript classes extending PixiJS `Container` — not React components.
 
 ### PixiJS Component Pattern
 
-Game objects (Card, SnapArea) extend `Container`, draw with `Graphics`/`Text` in the constructor, and handle their own pointer events. All live as siblings on `app.stage` (not nested) to keep coordinates simple.
-
-**SnapArea** uses a static registry — instances auto-register on construction. `SnapArea.nearest(x, y)` finds the closest area. Card's `onDragEnd` calls this to snap cards. Call `SnapArea.clearAll()` between tests to prevent leaks.
+Game objects (SpotlightReel, ReelItemTile, RevealEffect) extend `Container`, draw with `Graphics`/`Text` in the constructor, and manage their own animation via the PixiJS `Ticker`. All live as siblings on `app.stage` (not nested) to keep coordinates simple.
 
 ### Testing
 
