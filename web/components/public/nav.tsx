@@ -55,13 +55,8 @@ export const Navigation = () => (
   <div className="flex justify-center items-center gap-2">
     <MobileNav />
     <div className="flex-shrink-0">
-      {/*
-        Placeholder for app logo.
-        Replace the <img> below with your real logo once available.
-        You can update the src, alt, and styling as needed for your brand.
-      */}
-      <Link to="/" className="text-xl font-bold">
-        <img src="/api/assets/autologo?background=dark" alt="App name" className="h-5 w-auto" />
+      <Link to="/" className="text-xl font-bold text-white">
+        xxi
       </Link>
     </div>
     <DesktopNav />
