@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Application } from "pixi.js";
 import { SpotlightReel } from "./SpotlightReel";
-import { REEL_ITEM_HEIGHT, Rarity } from "./constants";
+import { REEL_ITEM_HEIGHT, CANVAS_BG, Rarity } from "./constants";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import type { ReelItem } from "./constants";
@@ -99,7 +99,7 @@ export default function PixiCanvas() {
       setCommitment((bundle as any).pendingServerSeedHash ?? null);
 
       await app.init({
-        background: "#0a0a14",
+        background: CANVAS_BG,
         resizeTo: container,
         antialias: true,
       });
@@ -205,7 +205,7 @@ export default function PixiCanvas() {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+      <div ref={containerRef} style={{ width: "100%", height: "100%", background: CANVAS_BG }} />
 
       {/* Fairness panel trigger — top right */}
       <div className="absolute top-4 right-4 z-10">

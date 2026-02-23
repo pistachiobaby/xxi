@@ -4,6 +4,10 @@ export const CARD_HEIGHT = 120;
 export const SNAP_AREA_WIDTH = 200;
 export const SNAP_AREA_HEIGHT = 300;
 
+// Canvas background — single source of truth for PixiJS bg, fade overlays, and container div
+export const CANVAS_BG = "#0a0a14";
+export const CANVAS_BG_RGB = { r: 10, g: 10, b: 20 };
+
 // --- Gacha Reel ---
 
 export enum Rarity {

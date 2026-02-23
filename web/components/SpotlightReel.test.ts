@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { Application } from "pixi.js";
+import { Application, Graphics } from "pixi.js";
 import { mount, waitFrames, snapshot } from "../test-helpers";
 import { SpotlightReel, ReelState } from "./SpotlightReel";
-import { REEL_ITEM_WIDTH, SPIN_SPEED, PLACEHOLDER_ITEMS } from "./constants";
+import { REEL_ITEM_WIDTH, REEL_ITEM_HEIGHT, SPIN_SPEED, PLACEHOLDER_ITEMS } from "./constants";
 import type { ReelItem } from "./constants";
 
 /** Wait until the reel returns to IDLE, or timeout after maxFrames. */
@@ -33,6 +33,22 @@ describe("SpotlightReel", () => {
 
   afterEach(() => {
     app.destroy(true, { children: true });
+  });
+
+  it("renders a center payline marker", () => {
+    const reel = new SpotlightReel(app, 700, PLACEHOLDER_ITEMS);
+    app.stage.addChild(reel);
+
+    // The last child added in the constructor is the payline Graphics
+    const payline = reel.children[reel.children.length - 1];
+    expect(payline).toBeInstanceOf(Graphics);
+
+    // Payline should span the full reel height and sit at the viewport center
+    const bounds = payline.getBounds();
+    const cx = 700 / 2;
+    expect(bounds.x).toBeLessThanOrEqual(cx);
+    expect(bounds.x + bounds.width).toBeGreaterThanOrEqual(cx);
+    expect(bounds.height).toBeGreaterThanOrEqual(REEL_ITEM_HEIGHT - 1);
   });
 
   it("starts in idle state", () => {

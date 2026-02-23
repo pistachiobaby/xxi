@@ -7,6 +7,7 @@ import {
   SPIN_DURATION,
   DECEL_DURATION,
   LANDING_DURATION,
+  CANVAS_BG_RGB,
 } from "./constants";
 import type { ReelItem } from "./constants";
 import { RevealEffect } from "./RevealEffect";
@@ -28,10 +29,7 @@ const SMOOTH_STOP_M0 = 2;
 const SPRING_AMPLITUDE = 25; // px
 const SPRING_DECAY = 5;      // damping rate
 const SPRING_FREQ = 14;      // rad/s (~2 visible oscillations)
-// Background color for fade overlays (matches canvas bg #0a0a14)
-const BG_R = 10;
-const BG_G = 10;
-const BG_B = 20;
+const { r: BG_R, g: BG_G, b: BG_B } = CANVAS_BG_RGB;
 
 /** Mulberry32 — deterministic 32-bit PRNG. Returns a function that yields [0, 1). */
 function mulberry32(seed: number): () => number {
@@ -123,6 +121,9 @@ export class SpotlightReel extends Container {
     this.addChild(this.createFade(true));  // left fade
     this.addChild(this.createFade(false)); // right fade
 
+    // Center payline marker
+    this.addChild(this.createPayline());
+
     this.tickerCallback = this.update.bind(this);
     app.ticker.add(this.tickerCallback);
   }
@@ -174,6 +175,31 @@ export class SpotlightReel extends Container {
     sprite.x = left ? 0 : this.viewportWidth - FADE_WIDTH;
     sprite.y = 0;
     return sprite;
+  }
+
+  private createPayline(): Graphics {
+    const cx = this.viewportWidth / 2;
+    const arrowSize = 6;
+    const g = new Graphics();
+
+    // Vertical line
+    g.moveTo(cx, arrowSize);
+    g.lineTo(cx, REEL_ITEM_HEIGHT - arrowSize);
+    g.stroke({ width: 2, color: 0xffffff, alpha: 0.35 });
+
+    // Top arrow
+    g.moveTo(cx - arrowSize, 0);
+    g.lineTo(cx, arrowSize);
+    g.lineTo(cx + arrowSize, 0);
+    g.fill({ color: 0xffffff, alpha: 0.5 });
+
+    // Bottom arrow
+    g.moveTo(cx - arrowSize, REEL_ITEM_HEIGHT);
+    g.lineTo(cx, REEL_ITEM_HEIGHT - arrowSize);
+    g.lineTo(cx + arrowSize, REEL_ITEM_HEIGHT);
+    g.fill({ color: 0xffffff, alpha: 0.5 });
+
+    return g;
   }
 
   private applyScroll() {
