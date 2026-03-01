@@ -48,7 +48,7 @@ interface NavItem {
 const navigationItems: NavItem[] = [
   {
     title: "Home",
-    path: "/signed-in",
+    path: "/profile",
     icon: Home,
   },
 ];
@@ -97,7 +97,7 @@ export const Navigation = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   return (
     <>
       <div className="h-16 flex items-center px-6 border-b">
-        <Link to="/signed-in" className="flex items-center" onClick={onLinkClick}>
+        <Link to="/profile" className="flex items-center" onClick={onLinkClick}>
           <img src="/api/assets/autologo?background=light" alt="App logo" className="h-8 w-auto" />
         </Link>
       </div>

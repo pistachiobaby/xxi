@@ -59,5 +59,10 @@ export const schema: GadgetModel = {
       default: ["unauthenticated"],
       storageKey: "1P_eB4Lx5t4v",
     },
+    rolls: {
+      type: "hasMany",
+      children: { model: "roll", belongsToField: "user" },
+      storageKey: "user-rolls-hm-01",
+    },
   },
 };

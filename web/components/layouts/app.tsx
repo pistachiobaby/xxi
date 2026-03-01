@@ -22,7 +22,7 @@ export default function AppLayout() {
 
   return (
     <SignedInOrRedirect>
-      <div className="h-screen flex overflow-hidden">
+      <div className="dark h-screen flex overflow-hidden bg-background text-foreground">
         <DesktopNav />
         <div className="flex-1 flex flex-col md:pl-64 min-w-0">
           <header className="h-16 flex items-center justify-between px-6 border-b bg-background z-10 w-full">

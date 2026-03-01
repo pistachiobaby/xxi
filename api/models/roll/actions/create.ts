@@ -12,7 +12,8 @@ function weightedSelect(rollValue: number, items: { id: string; chance: number }
   return items[items.length - 1].id;
 }
 
-export const run: ActionRun = async ({ params, record, api }) => {
+export const run: ActionRun = async ({ params, record, api, session, logger }) => {
+  logger.info({ sessionId: session?.id, user: session?.get("user"), sessionJSON: session?.toJSON() }, "roll.create fired");
   applyParams(params, record);
   const bundleId = record.bundleId;
   if (!bundleId) throw new Error("Bundle is required");
@@ -74,6 +75,10 @@ export const run: ActionRun = async ({ params, record, api }) => {
   record.clientSeed = clientSeed;
   record.serverSeedHash = serverSeedHash;
   record.item = { _link: winnerId };
+  const userId = session?.get("user");
+  if (userId) {
+    record.user = { _link: userId };
+  }
   await save(record);
 
   // Rotate: store next seed in bundleSecret, only hash on bundle

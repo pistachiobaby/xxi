@@ -8,6 +8,7 @@ import type { ReelItem } from "./constants";
 import { api } from "../api";
 import { deriveOutcome } from "../lib/verify";
 import FairnessPanel, { type RollResult } from "./FairnessPanel";
+import { toast } from "sonner";
 
 // HMR counter — increments each time this module is re-evaluated,
 // which forces the useEffect to tear down and re-create the PixiJS app.
@@ -199,6 +200,16 @@ export default function PixiCanvas() {
       // Auto-generate new client seed for next roll
       setClientSeed(randomHex(16));
     } catch (e) {
+      console.error("Roll failed:", e);
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      toast.error("Roll failed", {
+        description: errorMsg,
+        duration: 15000,
+        action: {
+          label: "Copy",
+          onClick: () => navigator.clipboard.writeText(errorMsg),
+        },
+      });
       setRolling(false);
     }
   }, [rolling, bundleId, items, itemChances, clientSeed]);

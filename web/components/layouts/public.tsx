@@ -30,7 +30,7 @@ export default function PublicLayout() {
             <div className="flex items-center space-x-2">
               {user ? (
                 <Button variant="ghost" size="lg" className="p-2 rounded-full" asChild>
-                  <Link to="/signed-in">
+                  <Link to="/profile">
                     Go to app
                     <UserIcon user={user} />
                   </Link>

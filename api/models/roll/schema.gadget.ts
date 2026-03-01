@@ -23,5 +23,10 @@ export const schema: GadgetModel = {
       type: "string",
       storageKey: "roll-seed-hash-01",
     },
+    user: {
+      type: "belongsTo",
+      parent: { model: "user" },
+      storageKey: "roll-user-bt-01",
+    },
   },
 };

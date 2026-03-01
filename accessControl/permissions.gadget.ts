@@ -58,6 +58,7 @@ export const permissions: GadgetPermissions = {
         },
       },
       actions: {
+        copyFromDev: true,
         seedBundle: true,
       },
     },
