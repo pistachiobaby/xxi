@@ -7,3 +7,4 @@ node_modules/
 **/__screenshots__/
 **/__traces__/
 .env.local
+env.local
