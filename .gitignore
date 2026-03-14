@@ -13,3 +13,4 @@ env.local
 e2e/.auth-state.json
 test-results/
 playwright-report/
+.claude/plans/
