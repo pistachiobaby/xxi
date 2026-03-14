@@ -7,6 +7,11 @@ export const schema: GadgetModel = {
   type: "gadget/model-schema/v2",
   storageKey: "DataModel-AppAuth-User",
   fields: {
+    balance: {
+      type: "number",
+      default: 0,
+      storageKey: "user-balance-01",
+    },
     email: {
       type: "email",
       validations: { required: true, unique: true },
@@ -29,6 +34,11 @@ export const schema: GadgetModel = {
     firstName: { type: "string", storageKey: "UvieFGUcHv2J" },
     googleImageUrl: { type: "url", storageKey: "l3yEIxsXHVpI" },
     googleProfileId: { type: "string", storageKey: "wy2gzbeyfPC5" },
+    inventory: {
+      type: "hasMany",
+      children: { model: "inventoryItem", belongsToField: "user" },
+      storageKey: "user-inv-hm-01",
+    },
     lastName: { type: "string", storageKey: "_jz6IhP-fjcm" },
     lastSignedIn: {
       type: "dateTime",

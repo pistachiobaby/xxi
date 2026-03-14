@@ -1,0 +1,3 @@
+filter ($session: Session) on InventoryItem [
+  where userId == $session.userId
+]

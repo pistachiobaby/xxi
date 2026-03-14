@@ -78,8 +78,23 @@ export const run: ActionRun = async ({ params, record, api, session, logger }) =
   const userId = session?.get("user");
   if (userId) {
     record.user = { _link: userId };
+  } else if (params.claimToken) {
+    record.claimToken = params.claimToken as string;
   }
   await save(record);
+
+  // Create inventory item for authenticated users
+  if (userId) {
+    const item = await api.internal.item.findOne(winnerId, {
+      select: { value: true },
+    });
+    await api.internal.inventoryItem.create({
+      user: { _link: userId },
+      item: { _link: winnerId },
+      roll: { _link: record.id },
+      value: item.value ?? 0,
+    });
+  }
 
   // Rotate: store next seed in bundleSecret, only hash on bundle
   await api.internal.bundleSecret.update(secret.id, {
@@ -92,6 +107,7 @@ export const run: ActionRun = async ({ params, record, api, session, logger }) =
 
 export const params = {
   clientSeed: { type: "string" },
+  claimToken: { type: "string" },
 };
 
 export const options: ActionOptions = {

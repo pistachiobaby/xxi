@@ -22,5 +22,10 @@ export const schema: GadgetModel = {
       options: ["Common", "Rare", "Epic", "Legendary"],
       storageKey: "_qVsOt-OHxBN",
     },
+    value: {
+      type: "number",
+      default: 0,
+      storageKey: "item-value-01",
+    },
   },
 };

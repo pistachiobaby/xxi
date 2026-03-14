@@ -24,6 +24,18 @@ export const permissions: GadgetPermissions = {
             update: true,
           },
         },
+        inventoryItem: {
+          read: {
+            filter:
+              "accessControl/filters/inventoryItem/tenant.gelly",
+          },
+          actions: {
+            sell: {
+              filter:
+                "accessControl/filters/inventoryItem/tenant.gelly",
+            },
+          },
+        },
         item: {
           read: true,
           actions: {
@@ -33,7 +45,9 @@ export const permissions: GadgetPermissions = {
           },
         },
         roll: {
-          read: true,
+          read: {
+            filter: "accessControl/filters/roll/tenant.gelly",
+          },
           actions: {
             create: true,
             delete: true,
@@ -58,8 +72,10 @@ export const permissions: GadgetPermissions = {
         },
       },
       actions: {
+        claimAnonymousRolls: true,
         copyFromDev: true,
         seedBundle: true,
+        sellAllDuplicates: true,
       },
     },
     unauthenticated: {

@@ -12,6 +12,7 @@ export const schema: GadgetModel = {
       parent: { model: "bundle" },
       storageKey: "roll-bndl-bt-01",
     },
+    claimToken: { type: "string", storageKey: "roll-claim-token-01" },
     clientSeed: { type: "string", storageKey: "roll-client-seed-01" },
     item: {
       type: "belongsTo",
