@@ -1,12 +1,14 @@
-import { Provider } from "@gadgetinc/react";
+import { Provider, useUser } from "@gadgetinc/react";
 import { Suspense, useEffect, useRef } from "react";
 import { BrowserRouter, Outlet, Route, Routes, useNavigate } from "react-router";
 import { api } from "../api";
+import { clearUnclaimedRolls } from "../lib/unclaimed-rolls";
 import "../app.css";
 import ForgotPasswordPage from "../routes/forgot-password";
 import IndexPage from "../routes/index";
 import NotFoundPage from "../routes/not-found";
 import ProfilePage from "../routes/profile";
+import InventoryPage from "../routes/inventory";
 import ResetPasswordPage from "../routes/reset-password";
 import SignInPage from "../routes/sign-in";
 import SignUpPage from "../routes/sign-up";
@@ -73,6 +75,7 @@ const App = () => {
             </Route>
             <Route element={<AppLayout />}>
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="inventory" element={<InventoryPage />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
@@ -82,11 +85,45 @@ const App = () => {
   );
 };
 
+/**
+ * Claims anonymous rolls when a user signs in.
+ * Reads claimToken from localStorage and calls the server-side global action.
+ * Handles all auth flows: email signIn, signUp, and Google OAuth.
+ */
+function ClaimAnonymousRolls() {
+  const user = useUser();
+  const claimed = useRef(false);
+
+  useEffect(() => {
+    if (!user?.id || claimed.current) return;
+    const token = localStorage.getItem("anonClaimToken");
+    if (!token) return;
+
+    claimed.current = true;
+    api
+      .claimAnonymousRolls({ claimToken: token, userId: user.id })
+      .then(() => {
+        localStorage.removeItem("anonClaimToken");
+        clearUnclaimedRolls();
+      })
+      .catch((err) => {
+        console.error("Failed to claim anonymous rolls:", err);
+        toast.error("Failed to claim your rolls", {
+          description: err instanceof Error ? err.message : String(err),
+        });
+        claimed.current = false;
+      });
+  }, [user?.id]);
+
+  return null;
+}
+
 const Layout = () => {
   const navigate = useNavigate();
 
   return (
     <Provider api={api} navigate={navigate} auth={window.gadgetConfig.authentication}>
+      <ClaimAnonymousRolls />
       <Outlet />
     </Provider>
   );

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Application } from "pixi.js";
 import { SpotlightReel } from "./SpotlightReel";
 import { REEL_ITEM_HEIGHT, CANVAS_BG, Rarity } from "./constants";
@@ -9,6 +9,9 @@ import { api } from "../api";
 import { deriveOutcome } from "../lib/verify";
 import FairnessPanel, { type RollResult } from "./FairnessPanel";
 import { toast } from "sonner";
+import { useUser } from "@gadgetinc/react";
+import UnclaimedRollsBadge from "./UnclaimedRollsBadge";
+import { getUnclaimedRolls, addUnclaimedRoll, type UnclaimedRoll } from "../lib/unclaimed-rolls";
 
 // HMR counter — increments each time this module is re-evaluated,
 // which forces the useEffect to tear down and re-create the PixiJS app.
@@ -47,8 +50,21 @@ export default function PixiCanvas() {
 
   // Provably fair state
   const [commitment, setCommitment] = useState<string | null>(null);
+
+  // Anonymous roll claiming: generate a persistent token for this browser
+  const claimToken = useMemo(() => {
+    const key = "anonClaimToken";
+    let token = localStorage.getItem(key);
+    if (!token) {
+      token = crypto.randomUUID();
+      localStorage.setItem(key, token);
+    }
+    return token;
+  }, []);
   const [clientSeed, setClientSeed] = useState(() => randomHex(16));
   const [lastRoll, setLastRoll] = useState<RollResult | null>(null);
+  const user = useUser();
+  const [unclaimedRolls, setUnclaimedRolls] = useState<UnclaimedRoll[]>(() => getUnclaimedRolls());
 
   useEffect(() => {
     const container = containerRef.current;
@@ -150,7 +166,7 @@ export default function PixiCanvas() {
     setLastRoll(null);
     try {
       const roll = await api.roll.create(
-        { bundle: { _link: bundleId }, clientSeed },
+        { bundle: { _link: bundleId }, clientSeed, claimToken },
         {
           select: {
             id: true,
@@ -189,6 +205,17 @@ export default function PixiCanvas() {
         winnerName: roll.item!.name!,
       };
 
+      // Track unclaimed rolls for anonymous users
+      if (!user) {
+        const updated = addUnclaimedRoll({
+          id: roll.id,
+          name: roll.item!.name!,
+          rarity: roll.item!.rarity!,
+          rolledAt: new Date().toISOString(),
+        });
+        setUnclaimedRolls(updated);
+      }
+
       // Fetch updated commitment for next roll
       const updated = await api.bundle.findFirst({
         select: { pendingServerSeedHash: true },
@@ -212,7 +239,7 @@ export default function PixiCanvas() {
       });
       setRolling(false);
     }
-  }, [rolling, bundleId, items, itemChances, clientSeed]);
+  }, [rolling, bundleId, items, itemChances, clientSeed, user]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -244,14 +271,18 @@ export default function PixiCanvas() {
         }}
       >
         {result && (
-          <div className="flex items-center gap-2">
+          <div data-testid="roll-result" className="flex items-center gap-2">
             <Badge className={RARITY_COLORS[result.rarity]}>
               {result.rarity}
             </Badge>
             <span className="text-white font-bold text-lg">{result.name}</span>
           </div>
         )}
+        {!user && unclaimedRolls.length > 0 && (
+          <UnclaimedRollsBadge rolls={unclaimedRolls} />
+        )}
         <Button
+          data-testid="roll-button"
           size="lg"
           onClick={handleRoll}
           disabled={rolling || !bundleId || !clientSeed.trim()}

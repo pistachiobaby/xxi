@@ -25,7 +25,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useSignOut } from "@gadgetinc/react";
 import { NavDrawer } from "@/components/shared/NavDrawer";
-import { Home, User, LogOut } from "lucide-react";
+import { Home, User, LogOut, Backpack } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,6 +50,11 @@ const navigationItems: NavItem[] = [
     title: "Home",
     path: "/profile",
     icon: Home,
+  },
+  {
+    title: "Inventory",
+    path: "/inventory",
+    icon: Backpack,
   },
 ];
 
@@ -83,6 +88,11 @@ const secondaryNavigationItems: NavItem[] = [
     title: "Profile",
     path: "/profile",
     icon: User,
+  },
+  {
+    title: "Inventory",
+    path: "/inventory",
+    icon: Backpack,
   },
 ];
 
