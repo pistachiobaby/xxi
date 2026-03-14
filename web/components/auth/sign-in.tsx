@@ -18,7 +18,9 @@ export const SignInComponent = (props: {
     submit,
     register,
     formState: { errors, isSubmitting },
-  } = useActionForm(api.user.signIn, props.options);
+  } = useActionForm(api.user.signIn, {
+    ...props.options,
+  });
 
   return (
     <div className="w-full max-w-4xl px-8">

@@ -10,10 +10,6 @@ export const run: ActionRun = async ({ params, record, logger, api, session }) =
   session?.set("user", { _link: record.id });
 };
 
-export const onSuccess: ActionOnSuccess = async ({ params, record, logger, api, session }) => {
-  // Your logic goes here
-};
-
 export const options: ActionOptions = {
   actionType: "update",
   triggers: {
