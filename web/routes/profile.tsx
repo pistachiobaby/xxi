@@ -125,7 +125,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Roll history */}
-        <div>
+        <div data-testid="roll-history">
           <h2 className="text-lg font-semibold mb-3">Roll History</h2>
 
           {fetching && <p className="text-muted-foreground">Loading rolls...</p>}
@@ -142,7 +142,7 @@ export default function ProfilePage() {
               {rolls.map((roll) => {
                 const result = results[roll.id];
                 return (
-                  <Card key={roll.id} className="px-4">
+                  <Card key={roll.id} data-testid={`roll-item-${roll.id}`} className="px-4">
                     <AccordionItem value={roll.id} className="border-b-0">
                       <AccordionTrigger className="hover:no-underline">
                         <div className="flex items-center gap-3">
@@ -173,6 +173,7 @@ export default function ProfilePage() {
                           <SeedRow label="Client Seed" value={roll.clientSeed} />
 
                           <Button
+                            data-testid={`verify-roll-${roll.id}`}
                             variant="outline"
                             size="sm"
                             onClick={() => verify(roll)}
@@ -187,7 +188,7 @@ export default function ProfilePage() {
                           </Button>
 
                           {result && (
-                            <div className="flex flex-col gap-2 rounded border p-3 bg-muted/50">
+                            <div data-testid={`verification-result-${roll.id}`} className="flex flex-col gap-2 rounded border p-3 bg-muted/50">
                               <Check
                                 label="SHA-256(serverSeed) matches commitment"
                                 pass={result.hashValid}

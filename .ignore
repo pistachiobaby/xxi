@@ -1,5 +1,10 @@
+.direnv/
 .vitest/
 .vitest-attachments/
 **/__screenshots__/
 **/__traces__/
 .env.local
+.envrc.local
+e2e/.auth-state.json
+test-results/
+playwright-report/

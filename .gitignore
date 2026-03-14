@@ -8,4 +8,8 @@ node_modules/
 **/__traces__/
 .env.local
 env.local
+.envrc.local
 .direnv/
+e2e/.auth-state.json
+test-results/
+playwright-report/

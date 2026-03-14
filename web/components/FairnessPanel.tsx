@@ -95,6 +95,7 @@ export default function FairnessPanel({
     <Sheet>
       <SheetTrigger asChild>
         <button
+          data-testid="fairness-trigger"
           className="text-gray-500 hover:text-gray-300 text-xs font-mono underline underline-offset-2 transition-colors"
           title="Provably Fair"
         >
@@ -119,6 +120,7 @@ export default function FairnessPanel({
             </Label>
             <div className="flex gap-2">
               <Input
+                data-testid="client-seed-input"
                 value={clientSeed}
                 onChange={(e) => onClientSeedChange(e.target.value)}
                 disabled={disabled}
@@ -146,7 +148,7 @@ export default function FairnessPanel({
               Next Roll Commitment
             </Label>
             {commitment ? (
-              <code className="text-xs font-mono text-gray-300 bg-gray-900 border border-gray-700 rounded p-2 break-all select-all">
+              <code data-testid="server-commitment" className="text-xs font-mono text-gray-300 bg-gray-900 border border-gray-700 rounded p-2 break-all select-all">
                 {commitment}
               </code>
             ) : (
@@ -171,6 +173,7 @@ export default function FairnessPanel({
                 <Row label="Client Seed" value={lastRoll.clientSeed} mono />
 
                 <Button
+                  data-testid="fairness-verify-button"
                   onClick={runVerification}
                   disabled={verifying}
                   variant="outline"
@@ -180,7 +183,7 @@ export default function FairnessPanel({
                 </Button>
 
                 {verifyResult && (
-                  <div className="flex flex-col gap-2 bg-gray-900 border border-gray-700 rounded p-3">
+                  <div data-testid="fairness-verification-result" className="flex flex-col gap-2 bg-gray-900 border border-gray-700 rounded p-3">
                     <VerifyRow
                       label="SHA-256(serverSeed) matches commitment"
                       pass={verifyResult.hashValid}
